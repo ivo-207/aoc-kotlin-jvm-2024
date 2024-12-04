@@ -24,7 +24,7 @@ fun part2(): Any {
         when (instruction) {
             is Do -> enabled = true
             is Dont -> enabled = false
-            is Mul -> if (enabled) sum += instruction.product
+            is Mul -> sum += if (enabled) instruction.product else 0
         }
     }
     return sum
