@@ -1,6 +1,4 @@
-import kotlin.text.Charsets.US_ASCII
-
-private val table = readInput("Day4.input", ::toTable)
+private val table = readTable()
 
 fun main() {
     println(part1())
@@ -105,20 +103,16 @@ fun part2(): Any {
     return sum
 }
 
-private fun <T> readInput(name: String, transform: (Sequence<String>) -> T): T {
-    val bufferSize = 1024 * 1024
-    return object {}.javaClass.getResourceAsStream(name).use { it ->
-        it?.reader(US_ASCII).use { it ->
-            it?.buffered(bufferSize).use {
-                val lines = it?.lineSequence() ?: emptySequence()
-                transform(lines)
-            }
-        }
-    }
+private fun readInput(): List<String> {
+    return object {}.javaClass.getResource("Day4.input")
+        ?.readText()
+        ?.split("\n")
+        ?.filter { it.isNotEmpty() }
+        ?: emptyList()
 }
 
-private fun toTable(lines: Sequence<String>): Array<CharArray> {
-    return lines
+private fun readTable(): Array<CharArray> {
+    return readInput()
         .map { it.toCharArray() }
         .toList()
         .toTypedArray()
