@@ -1,7 +1,6 @@
 import kotlin.math.absoluteValue
-import kotlin.text.Charsets.US_ASCII
 
-private val numbers = readInput("Day1.input", ::toIntArray)
+private val numbers = readNumbers()
 
 private val leftList = IntArray(numbers.size / 2) { numbers[it * 2] }
     .sortedArray()
@@ -45,21 +44,17 @@ fun part2(): Any {
     return score
 }
 
-private fun <T> readInput(name: String, transform: (Sequence<String>) -> T): T {
-    val bufferSize = 1024 * 1024
-    return object {}.javaClass.getResourceAsStream(name).use { inputStream ->
-        inputStream?.reader(US_ASCII).use { reader ->
-            reader?.buffered(bufferSize).use {
-                val lines = it?.lineSequence() ?: emptySequence()
-                transform(lines)
-            }
-        }
-    }
+private fun readInput(): List<String> {
+    return object {}.javaClass.getResource("Day1.input")
+        ?.readText()
+        ?.split("\n")
+        ?: emptyList()
 }
 
-private fun toIntArray(lines: Sequence<String>): IntArray {
-    return lines
-        .flatMap { it.splitToSequence("   ") }
+private fun readNumbers(): IntArray {
+    return readInput()
+        .filter { it.isNotEmpty() }
+        .flatMap { it.split("   ") }
         .map { it.toInt() }
         .toList()
         .toIntArray()
