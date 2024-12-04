@@ -1,6 +1,4 @@
-import kotlin.text.Charsets.US_ASCII
-
-private val instructions = readInput("Day3.input", ::toInstructions)
+private val instructions = readInstructions()
 
 fun main() {
     println(part1())
@@ -30,23 +28,19 @@ fun part2(): Any {
     return sum
 }
 
-private fun <T> readInput(name: String, transform: (Sequence<String>) -> T): T {
-    val bufferSize = 1024 * 1024
-    return object {}.javaClass.getResourceAsStream(name).use { it ->
-        it?.reader(US_ASCII).use { it ->
-            it?.buffered(bufferSize).use {
-                val lines = it?.lineSequence() ?: emptySequence()
-                transform(lines)
-            }
-        }
-    }
+private fun readInput(): List<String> {
+    return object {}.javaClass.getResource("Day3.input")
+        ?.readText()
+        ?.split("\n")
+        ?.filter { it.isNotEmpty() }
+        ?: emptyList()
 }
 
-private fun toInstructions(lines: Sequence<String>): Array<Instruction> {
+private fun readInstructions(): Array<Instruction> {
     val doAndDontPattern = "do(?:n't)?\\(\\)"
     val mulPattern = "mul\\((\\d{1,3}),(\\d{1,3})\\)"
     val regex = "${doAndDontPattern}|${mulPattern}".toRegex()
-    return lines
+    return readInput()
         .flatMap { regex.findAll(it) }
         .map {
             when (it.value) {

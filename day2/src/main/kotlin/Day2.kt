@@ -1,6 +1,4 @@
-import kotlin.text.Charsets.US_ASCII
-
-private val reports = readInput("Day2.input", ::toReport)
+private val reports = readReports()
 
 fun main() {
     println(part1())
@@ -17,24 +15,17 @@ fun part2(): Any {
         .count { isSafe(it) || isSafePart2(it) }
 }
 
-private fun <T> readInput(name: String, transform: (Sequence<String>) -> T): T {
-    val bufferSize = 1024 * 1024
-    return object {}.javaClass.getResourceAsStream(name).use { it ->
-        it?.reader(US_ASCII).use { it ->
-            it?.buffered(bufferSize).use {
-                val lines = it?.lineSequence() ?: emptySequence()
-                transform(lines)
-            }
-        }
-    }
+private fun readInput(): List<String> {
+    return object {}.javaClass.getResource("Day2.input")
+        ?.readText()
+        ?.split("\n")
+        ?.filter { it.isNotEmpty() }
+        ?: emptyList()
 }
 
-private fun toReport(lines: Sequence<String>): Array<IntArray> {
-    return lines
-        .map { it.splitToSequence(" ") }
-        .map { it -> it.map { it.toInt() } }
-        .map { it.toList() }
-        .map { it.toIntArray() }
+private fun readReports(): Array<IntArray> {
+    return readInput()
+        .map { it -> it.split(" ").map { it.toInt() }.toList().toIntArray() }
         .toList()
         .toTypedArray()
 }

@@ -48,12 +48,12 @@ private fun readInput(): List<String> {
     return object {}.javaClass.getResource("Day1.input")
         ?.readText()
         ?.split("\n")
+        ?.filter { it.isNotEmpty() }
         ?: emptyList()
 }
 
 private fun readNumbers(): IntArray {
     return readInput()
-        .filter { it.isNotEmpty() }
         .flatMap { it.split("   ") }
         .map { it.toInt() }
         .toList()
