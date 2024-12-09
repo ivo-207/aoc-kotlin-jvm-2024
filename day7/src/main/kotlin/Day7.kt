@@ -7,19 +7,25 @@ private val equations = readInput()
     }
     .toTypedArray()
 
+private val operatorsGroups = Array(equations.maxOf { it.numbers.size }) {
+    val operators = arrayOf(Operator.ADD, Operator.MULTIPLY, Operator.CONCATENATION)
+    crossProduct(*operators, power = it)
+}
+
 fun main() {
     println(part1())
     println(part2())
 }
 
 fun part1(): Any {
-    val operators = arrayOf(Operator.ADD, Operator.MULTIPLY)
-    return getTotalCalibrationResult(*operators)
+    val operatorsGroups = operatorsGroups
+        .map { it.filterNot { it.contains(Operator.CONCATENATION) }.toTypedArray() }
+        .toTypedArray()
+    return getTotalCalibrationResult(*operatorsGroups)
 }
 
 fun part2(): Any {
-    val operators = arrayOf(Operator.ADD, Operator.MULTIPLY, Operator.CONCATENATION)
-    return getTotalCalibrationResult(*operators)
+    return getTotalCalibrationResult(*operatorsGroups)
 }
 
 private fun readInput(): List<String> {
@@ -30,13 +36,11 @@ private fun readInput(): List<String> {
         ?: emptyList()
 }
 
-private fun getTotalCalibrationResult(vararg operators: Operator): Long {
-    val operatorsGroupCache = mutableMapOf<Int, Array<Array<Operator>>>()
+private fun getTotalCalibrationResult(vararg operatorsGroups: Array<Array<Operator>>): Long {
     return equations
         .filter { equation ->
             val operatorsGroupSize = equation.numbers.size - 1
-            val operatorsGroup = operatorsGroupCache.getOrPut(operatorsGroupSize)
-            { crossProduct(*operators, power = operatorsGroupSize) }
+            val operatorsGroup = operatorsGroups[operatorsGroupSize]
             operatorsGroup.any { equation.testEvaluation(*it) }
         }
         .sumOf { it.testValue }
@@ -48,5 +52,5 @@ private fun crossProduct(vararg operators: Operator, power: Int): Array<Array<Op
     }
     return (0..<power)
         .fold(arrayOf(emptyArray<Operator>()))
-        { product, index -> product.flatMap { el -> operators.map { t -> el + t } }.toTypedArray() }
+        { product, _ -> product.flatMap { el -> operators.map { t -> el + t } }.toTypedArray() }
 }
