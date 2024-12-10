@@ -84,7 +84,7 @@ private fun runPatrol(mapMask: IntArray, labWidth: Int, guard: Int): Boolean {
             return true
         }
         mapMask[i] = tileMask.withMask(direction)
-        val offset = getOffsetAfterTurn(direction, labWidth)
+        val offset = getNextIndexOffset(direction, labWidth)
         i += offset
         val nextTileMask = mapMask[i]
         if (nextTileMask.isMoveBlocked()) {
@@ -131,7 +131,7 @@ private fun clearVisitedAndObstructionMask(mapMask: IntArray) {
         .forEach { mapMask[it] = mapMask[it] and CLEAR_MASK }
 }
 
-private fun getOffsetAfterTurn(direction: Int, labWidth: Int): Int {
+private fun getNextIndexOffset(direction: Int, labWidth: Int): Int {
     return when (direction) {
         DIRECTION_UP_MASK -> -labWidth
         DIRECTION_RIGHT_MASK -> 1
