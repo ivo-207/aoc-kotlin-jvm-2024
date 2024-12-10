@@ -1,4 +1,4 @@
-rootProject.name = "aoc-template-jvm"
+rootProject.name = "aoc-kotlin-jvm-2024"
 
 include("day1")
 include("day2")
