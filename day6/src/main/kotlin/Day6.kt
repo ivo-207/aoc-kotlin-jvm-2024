@@ -120,10 +120,6 @@ private fun Char.isObstacle(): Boolean {
     return this == '#'
 }
 
-private fun Char.isObstruction(): Boolean {
-    return this == 'O'
-}
-
 private fun getLabTileMap(): Triple<IntArray, Int, Int> {
     val input = readInput()
         .map { it.toCharArray() }
@@ -144,7 +140,6 @@ private fun getLabTileMap(): Triple<IntArray, Int, Int> {
             when {
                 tile.isGuard() -> GUARD
                 tile.isObstacle() -> OBSTACLE
-                tile.isObstruction() -> OBSTRUCTION
                 else -> 0
             }
         }
