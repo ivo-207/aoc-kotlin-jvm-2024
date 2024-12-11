@@ -1,16 +1,13 @@
+import kotlin.math.pow
+
 private val equations = readInput()
     .map {
         val testValueAndNumbers = it.split(": ")
         val testValue = testValueAndNumbers[0].toLong()
         val numbers = testValueAndNumbers[1].split(" ").map { it.toLong() }.toLongArray()
-        Equation(testValue, numbers)
+        longArrayOf(testValue, *numbers)
     }
     .toTypedArray()
-
-private val operatorsGroups = Array(equations.maxOf { it.numbers.size }) {
-    val operators = arrayOf(Operator.ADD, Operator.MULTIPLY, Operator.CONCATENATION)
-    crossProduct(*operators, power = it)
-}
 
 fun main() {
     println(part1())
@@ -18,14 +15,23 @@ fun main() {
 }
 
 fun part1(): Any {
-    val operatorsGroups = operatorsGroups
-        .map { it.filterNot { it.contains(Operator.CONCATENATION) }.toTypedArray() }
-        .toTypedArray()
-    return getTotalCalibrationResult(*operatorsGroups)
+    var acc: Long = 0
+    var i = 0
+    while (i < equations.size) {
+        acc += getCalibrationResult(equations[i], 2)
+        i += 1
+    }
+    return acc
 }
 
 fun part2(): Any {
-    return getTotalCalibrationResult(*operatorsGroups)
+    var acc: Long = 0
+    var i = 0
+    while (i < equations.size) {
+        acc += getCalibrationResult(equations[i], 3)
+        i += 1
+    }
+    return acc
 }
 
 private fun readInput(): List<String> {
@@ -36,21 +42,49 @@ private fun readInput(): List<String> {
         ?: emptyList()
 }
 
-private fun getTotalCalibrationResult(vararg operatorsGroups: Array<Array<Operator>>): Long {
-    return equations
-        .filter { equation ->
-            val operatorsGroupSize = equation.numbers.size - 1
-            val operatorsGroup = operatorsGroups[operatorsGroupSize]
-            operatorsGroup.any { equation.testEvaluation(*it) }
-        }
-        .sumOf { it.testValue }
+private fun Int.pow(n: Int): Int {
+    return this.toDouble().pow(n).toInt()
 }
 
-private fun crossProduct(vararg operators: Operator, power: Int): Array<Array<Operator>> {
-    if (power < 0) {
-        return emptyArray()
+private fun getCalibrationResult(numbers: LongArray, operatorsSize: Int): Long {
+    val operatorsGroupsSize = operatorsSize.pow(numbers.size - 2)
+    val testValue = numbers[0]
+    var operatorsGroup = 0
+    while (operatorsGroup < operatorsGroupsSize) {
+        var operatorsMask = operatorsGroup
+        var acc = numbers[1]
+        var i = 2
+        acc@ while (i < numbers.size) {
+            acc = runOperator(operatorsMask % operatorsSize, acc, numbers[i])
+            if (acc > testValue) {
+                break@acc
+            }
+            operatorsMask /= operatorsSize
+            i += 1
+        }
+        if (acc == testValue) {
+            return testValue
+        }
+        operatorsGroup += 1
     }
-    return (0..<power)
-        .fold(arrayOf(emptyArray<Operator>()))
-        { product, _ -> product.flatMap { el -> operators.map { t -> el + t } }.toTypedArray() }
+    return 0
 }
+
+private fun runOperator(operator: Int, first: Long, second: Long): Long {
+    return when (operator) {
+        0 -> first + second
+        1 -> first * second
+        2 -> {
+            var acc = first
+            var dividend = second
+            do {
+                dividend /= 10
+                acc *= 10
+            } while (dividend > 0)
+            acc + second
+        }
+
+        else -> 0
+    }
+}
+
