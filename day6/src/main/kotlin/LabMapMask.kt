@@ -25,15 +25,19 @@ class LabMapMask(inputLines: List<String>) {
         val mapMask = IntArray(labWidth * labHeight)
         fillEdges(labWidth, mapMask)
         var guard = -1
-        for (y in 1 until labHeight - 1) {
-            for (x in 1 until labWidth - 1) {
+        var y = 1
+        while (y < labHeight - 1) {
+            var x = 1
+            while (x < labWidth - 1) {
                 val tile = inputLines[y - 1][x - 1]
                 val i = y * labWidth + x
                 when {
                     tile.isObstacle() -> mapMask[i] = OBSTACLE_MASK
                     tile.isGuard() -> guard = i
                 }
+                x += 1
             }
+            y += 1
         }
         val patrolIndices = computePatrolIndices(mapMask, labWidth, guard)
         this.mapMask = mapMask
@@ -53,15 +57,21 @@ class LabMapMask(inputLines: List<String>) {
 }
 
 private fun fillEdges(labWidth: Int, mapMask: IntArray) {
-    for (i in 0 until labWidth) {
+    var i = 0
+    while (i < labWidth) {
         mapMask[i] = EDGE_MASK
+        i += 1
     }
-    for (i in labWidth until (mapMask.size - labWidth) step labWidth) {
+    i = labWidth
+    while (i < mapMask.size - labWidth) {
         mapMask[i] = EDGE_MASK
         mapMask[i + labWidth - 1] = EDGE_MASK
+        i += labWidth
     }
-    for (i in (mapMask.size - labWidth) until mapMask.size) {
+    i = mapMask.size - labWidth
+    while (i < mapMask.size) {
         mapMask[i] = EDGE_MASK
+        i += 1
     }
 }
 
@@ -117,18 +127,23 @@ private fun Int.isMoveBlocked(): Boolean {
 
 private fun computePatrolLoopCount(mapMask: IntArray, labWidth: Int, guard: Int, patrolIndices: IntArray): Int {
     var loopCount = 0
-    for (patrol in 1 until patrolIndices.size) {
+    var patrol = 1
+    while (patrol < patrolIndices.size) {
         clearVisitedAndObstructionMask(mapMask)
         val obstruction = patrolIndices[patrol]
         mapMask[obstruction] = mapMask[obstruction].withMask(OBSTRUCTION_MASK)
         loopCount += if (runPatrol(mapMask, labWidth, guard)) 1 else 0
+        patrol += 1
     }
     return loopCount
 }
 
 private fun clearVisitedAndObstructionMask(mapMask: IntArray) {
-    mapMask.indices
-        .forEach { mapMask[it] = mapMask[it] and CLEAR_MASK }
+    var i = 0
+    while (i < mapMask.size) {
+        mapMask[i] = mapMask[i] and CLEAR_MASK
+        i += 1
+    }
 }
 
 private fun getNextIndexOffset(direction: Int, labWidth: Int): Int {
