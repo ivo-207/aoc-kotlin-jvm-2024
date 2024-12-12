@@ -25,8 +25,7 @@ private fun readInput(): List<String> {
 
 private fun readReports(): Array<IntArray> {
     return readInput()
-        .map { it -> it.split(" ").map { it.toInt() }.toList().toIntArray() }
-        .toList()
+        .map { it -> it.split(" ").map { it.toInt() }.toIntArray() }
         .toTypedArray()
 }
 
