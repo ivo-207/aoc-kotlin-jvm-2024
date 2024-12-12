@@ -1,12 +1,7 @@
 import kotlin.math.pow
 
 private val equations = readInput()
-    .map {
-        val testValueAndNumbers = it.split(": ")
-        val testValue = testValueAndNumbers[0].toLong()
-        val numbers = testValueAndNumbers[1].split(" ").map { it.toLong() }.toLongArray()
-        longArrayOf(testValue, *numbers)
-    }
+    .map { it -> it.split(": ", " ").map { it.toLong() }.toLongArray() }
     .toTypedArray()
 
 fun main() {
@@ -18,17 +13,55 @@ fun part1(): Any {
     var acc: Long = 0
     var i = 0
     while (i < equations.size) {
-        acc += getCalibrationResult(equations[i], 2)
+        val equation = equations[i]
+        val testValue = equation[0]
+        val numbers = equation.copyOfRange(1, equation.size)
+        val partialResults = LongArray(numbers.size)
+        val calculated = calculate(testValue, numbers, partialResults, 0, 2)
+        acc += if (calculated) testValue else 0
         i += 1
     }
     return acc
+}
+
+private fun calculate(testValue: Long, numbers: LongArray, partialResults: LongArray, i: Int, operatorsSize: Int): Boolean {
+
+    when {
+        i == 0 -> {
+            val number = numbers[i]
+            partialResults[0] = number
+            return calculate(testValue, numbers, partialResults, 1, operatorsSize)
+        }
+
+        i < numbers.size -> {
+            val number = numbers[i]
+            val previousResult = partialResults[i - 1]
+            for (op in 0 until operatorsSize) {
+                val result = runOperator(op, previousResult, number)
+                partialResults[i] = result
+                if (calculate(testValue, numbers, partialResults, i + 1, operatorsSize)) {
+                    return true
+                }
+            }
+        }
+
+        i == numbers.size -> {
+            return partialResults[i - 1] == testValue
+        }
+    }
+    return false
 }
 
 fun part2(): Any {
     var acc: Long = 0
     var i = 0
     while (i < equations.size) {
-        acc += getCalibrationResult(equations[i], 3)
+        val equation = equations[i]
+        val testValue = equation[0]
+        val numbers = equation.copyOfRange(1, equation.size)
+        val partialResults = LongArray(numbers.size)
+        val calculated = calculate(testValue, numbers, partialResults, 0, 3)
+        acc += if (calculated) testValue else 0
         i += 1
     }
     return acc
