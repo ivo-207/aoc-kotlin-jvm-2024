@@ -1,8 +1,15 @@
-import kotlin.math.pow
+private const val OPERATOR_0_MASK: Long = 1 shl 0
+private const val OPERATOR_1_MASK: Long = 1 shl 1
+private const val OPERATOR_2_MASK: Long = 1 shl 2
 
-private val equations = readInput()
-    .map { it -> it.split(": ", " ").map { it.toLong() }.toLongArray() }
-    .toTypedArray()
+private const val PART_1_MASK = OPERATOR_0_MASK or OPERATOR_1_MASK
+private const val PART_1_MASK_NEG = PART_1_MASK.inv()
+private const val PART_2_MASK = OPERATOR_0_MASK or OPERATOR_1_MASK or OPERATOR_2_MASK
+
+private const val TEST_VALUE_INDEX = 0
+private const val NUMBERS_START_INDEX = 1
+
+private val answers = getAnswers(readInput())
 
 fun main() {
     println(part1())
@@ -12,57 +19,19 @@ fun main() {
 fun part1(): Any {
     var acc: Long = 0
     var i = 0
-    while (i < equations.size) {
-        val equation = equations[i]
-        val testValue = equation[0]
-        val numbers = equation.copyOfRange(1, equation.size)
-        val partialResults = LongArray(numbers.size)
-        val calculated = calculate(testValue, numbers, partialResults, 0, 2)
-        acc += if (calculated) testValue else 0
-        i += 1
+    while (i < answers.size) {
+        acc += if (answers[i].isPart1Answer()) answers[i + 1] else 0
+        i += 2
     }
     return acc
-}
-
-private fun calculate(testValue: Long, numbers: LongArray, partialResults: LongArray, i: Int, operatorsSize: Int): Boolean {
-
-    when {
-        i == 0 -> {
-            val number = numbers[i]
-            partialResults[0] = number
-            return calculate(testValue, numbers, partialResults, 1, operatorsSize)
-        }
-
-        i < numbers.size -> {
-            val number = numbers[i]
-            val previousResult = partialResults[i - 1]
-            for (op in 0 until operatorsSize) {
-                val result = runOperator(op, previousResult, number)
-                partialResults[i] = result
-                if (calculate(testValue, numbers, partialResults, i + 1, operatorsSize)) {
-                    return true
-                }
-            }
-        }
-
-        i == numbers.size -> {
-            return partialResults[i - 1] == testValue
-        }
-    }
-    return false
 }
 
 fun part2(): Any {
     var acc: Long = 0
     var i = 0
-    while (i < equations.size) {
-        val equation = equations[i]
-        val testValue = equation[0]
-        val numbers = equation.copyOfRange(1, equation.size)
-        val partialResults = LongArray(numbers.size)
-        val calculated = calculate(testValue, numbers, partialResults, 0, 3)
-        acc += if (calculated) testValue else 0
-        i += 1
+    while (i < answers.size) {
+        acc += if (answers[i].isPart2Answer()) answers[i + 1] else 0
+        i += 2
     }
     return acc
 }
@@ -75,30 +44,47 @@ private fun readInput(): List<String> {
         ?: emptyList()
 }
 
-private fun Int.pow(n: Int): Int {
-    return this.toDouble().pow(n).toInt()
+private fun getAnswers(input: List<String>): LongArray {
+    val answers = LongArray(input.size * 2)
+    var i = 0
+    while (i < input.size) {
+        val line = input[i]
+        fillAnswers(answers, line, i)
+        i += 1
+    }
+    return answers
 }
 
-private fun getCalibrationResult(numbers: LongArray, operatorsSize: Int): Long {
-    val operatorsGroupsSize = operatorsSize.pow(numbers.size - 2)
-    val testValue = numbers[0]
-    var operatorsGroup = 0
-    while (operatorsGroup < operatorsGroupsSize) {
-        var operatorsMask = operatorsGroup
-        var acc = numbers[1]
-        var i = 2
-        acc@ while (i < numbers.size) {
-            acc = runOperator(operatorsMask % operatorsSize, acc, numbers[i])
+private fun fillAnswers(answers: LongArray, line: String, lineIndex: Int) {
+    val equation = line.split(": ", " ").map { it.toLong() }.toLongArray()
+    val testValue = equation[TEST_VALUE_INDEX]
+    val answerMask = getAnswerMask(equation, NUMBERS_START_INDEX + 1, equation.size - 1)
+    answers[lineIndex * 2] = answerMask.toLong()
+    answers[lineIndex * 2 + 1] = testValue
+}
+
+private fun getAnswerMask(equation: LongArray, numberIndex: Int, numerLastIndex: Int): Int {
+    val testValue = equation[TEST_VALUE_INDEX]
+    val previousAcc = equation[numberIndex - 1]
+    val number = equation[numberIndex]
+    var operatorIndex = 0
+    while (operatorIndex < 3) {
+        val operatorMask = 1 shl operatorIndex
+        val acc = runOperator(operatorIndex, previousAcc, number)
+        if (numberIndex != numerLastIndex) {
             if (acc > testValue) {
-                break@acc
+                return 0
             }
-            operatorsMask /= operatorsSize
-            i += 1
+            equation[numberIndex] = acc
+            val checkResult = getAnswerMask(equation, numberIndex + 1, numerLastIndex)
+            equation[numberIndex] = number
+            if (checkResult != 0) {
+                return checkResult or operatorMask
+            }
+        } else if (acc == testValue) {
+            return operatorMask
         }
-        if (acc == testValue) {
-            return testValue
-        }
-        operatorsGroup += 1
+        operatorIndex += 1
     }
     return 0
 }
@@ -114,10 +100,18 @@ private fun runOperator(operator: Int, first: Long, second: Long): Long {
                 dividend /= 10
                 acc *= 10
             } while (dividend > 0)
-            acc + second
+            acc += second
+            acc
         }
 
         else -> 0
     }
 }
 
+private fun Long.isPart1Answer(): Boolean {
+    return this and PART_1_MASK != 0L && this and PART_1_MASK_NEG == 0L
+}
+
+private fun Long.isPart2Answer(): Boolean {
+    return this and PART_2_MASK != 0L
+}
