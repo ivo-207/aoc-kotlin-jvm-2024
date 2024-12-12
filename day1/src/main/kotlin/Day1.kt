@@ -1,12 +1,7 @@
 import kotlin.math.absoluteValue
 
 private val numbers = readNumbers()
-
-private val leftList = IntArray(numbers.size / 2) { numbers[it * 2] }
-    .sortedArray()
-
-private val rightList = IntArray(numbers.size / 2) { numbers[it * 2 + 1] }
-    .sortedArray()
+private val columnLength = numbers.size / 2
 
 fun main() {
     println(part1())
@@ -14,34 +9,62 @@ fun main() {
 }
 
 fun part1(): Any {
-    var distance = 0
-    val limit = numbers.size / 2
-    var i = 0
-    while (i < limit) {
-        distance += (leftList[i] - rightList[i]).absoluteValue
-        i += 1
-    }
-    return distance
+    return getTotalDistance(numbers, columnLength)
 }
 
 fun part2(): Any {
-    var leftIndex = 0
-    var rightIndex = 0
-    var score = 0
-    while (leftIndex < leftList.size && rightIndex < rightList.size) {
-        val left = leftList[leftIndex]
-        var leftCount = 1
-        while (++leftIndex < leftList.size && left == leftList[leftIndex]) {
-            leftCount += 1
-        }
-        var rightCount = 0
-        while (rightIndex < rightList.size && rightList[rightIndex] <= left) {
-            val right = rightList[rightIndex++]
-            rightCount += if (left == right) 1 else 0
-        }
-        score += left * leftCount * rightCount
+    return getSimilarityScore(numbers, columnLength)
+}
+
+private fun getTotalDistance(numbers: IntArray, columnLength: Int): Int {
+    var totalDistance = 0
+    var i = 0
+    while (i < columnLength) {
+        val left = numbers[i]
+        val right = numbers[i + columnLength]
+        val distance = (left - right).absoluteValue
+        totalDistance += distance
+        i += 1
     }
-    return score
+    return totalDistance
+}
+
+private fun getSimilarityScore(numbers: IntArray, columnLength: Int): Int {
+    val leftEndIndex = columnLength
+    val rightEndIndex = leftEndIndex + columnLength
+    var similarityScore = 0
+    var leftIndex = 0
+    var rightIndex = leftEndIndex
+    while (leftIndex < leftEndIndex && rightIndex < rightEndIndex) {
+        val left = numbers[leftIndex]
+        val leftCount = countEq(numbers, leftIndex, leftEndIndex, left)
+        leftIndex += leftCount
+        rightIndex += countLt(numbers, rightIndex, rightEndIndex, left)
+        val rightCount = countEq(numbers, rightIndex, rightEndIndex, left)
+        rightIndex += rightCount
+        similarityScore += left * leftCount * rightCount
+    }
+    return similarityScore
+}
+
+private fun countEq(numbers: IntArray, startIndex: Int, endIndex: Int, value: Int): Int {
+    var count = 0
+    var i = startIndex
+    while (i < endIndex && numbers[i] == value) {
+        count += 1
+        i += 1
+    }
+    return count
+}
+
+private fun countLt(numbers: IntArray, startIndex: Int, endIndex: Int, value: Int): Int {
+    var count = 0
+    var i = startIndex
+    while (i < endIndex && numbers[i] < value) {
+        count += 1
+        i += 1
+    }
+    return count
 }
 
 private fun readInput(): List<String> {
@@ -53,9 +76,17 @@ private fun readInput(): List<String> {
 }
 
 private fun readNumbers(): IntArray {
-    return readInput()
-        .flatMap { it.split("   ") }
-        .map { it.toInt() }
-        .toList()
-        .toIntArray()
+    val input = readInput()
+    val columnSize = input.size
+    val numbers = IntArray(columnSize * 2)
+    var i = 0
+    while (i < columnSize) {
+        val tokens = input[i].split("   ")
+        numbers[i] = tokens[0].toInt()
+        numbers[columnSize + i] = tokens[1].toInt()
+        i += 1
+    }
+    numbers.sort(0, columnSize)
+    numbers.sort(columnSize)
+    return numbers
 }
