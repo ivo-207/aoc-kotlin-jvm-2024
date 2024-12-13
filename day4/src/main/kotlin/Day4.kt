@@ -1,4 +1,6 @@
-private val table = readTable()
+private const val EDGE_SIZE = 3
+
+private val lettersTable = getLettersTableWithWidth(readInput())
 
 fun main() {
     println(part1())
@@ -6,101 +8,61 @@ fun main() {
 }
 
 fun part1(): Any {
-    var sum = 0
-    for (y in table.indices) {
-        for (x in table[y].indices) {
-            if (isLetter(table, 'X', x, y)) {
-                if (isLetter(table, 'M', x + 1, y) &&
-                    isLetter(table, 'A', x + 2, y) &&
-                    isLetter(table, 'S', x + 3, y)
-                ) {
-                    sum += 1
-                }
-                if (isLetter(table, 'M', x + 1, y + 1) &&
-                    isLetter(table, 'A', x + 2, y + 2) &&
-                    isLetter(table, 'S', x + 3, y + 3)
-                ) {
-                    sum += 1
-                }
-                if (isLetter(table, 'M', x, y + 1) &&
-                    isLetter(table, 'A', x, y + 2) &&
-                    isLetter(table, 'S', x, y + 3)
-                ) {
-                    sum += 1
-                }
-                if (isLetter(table, 'M', x - 1, y + 1) &&
-                    isLetter(table, 'A', x - 2, y + 2) &&
-                    isLetter(table, 'S', x - 3, y + 3)
-                ) {
-                    sum += 1
-                }
-                if (isLetter(table, 'M', x - 1, y) &&
-                    isLetter(table, 'A', x - 2, y) &&
-                    isLetter(table, 'S', x - 3, y)
-                ) {
-                    sum += 1
-                }
-                if (isLetter(table, 'M', x - 1, y - 1) &&
-                    isLetter(table, 'A', x - 2, y - 2) &&
-                    isLetter(table, 'S', x - 3, y - 3)
-                ) {
-                    sum += 1
-                }
-                if (isLetter(table, 'M', x, y - 1) &&
-                    isLetter(table, 'A', x, y - 2) &&
-                    isLetter(table, 'S', x, y - 3)
-                ) {
-                    sum += 1
-                }
-                if (isLetter(table, 'M', x + 1, y - 1) &&
-                    isLetter(table, 'A', x + 2, y - 2) &&
-                    isLetter(table, 'S', x + 3, y - 3)
-                ) {
-                    sum += 1
-                }
-            }
+    val (letters, width) = lettersTable
+    val lastIndex = letters.size - width * EDGE_SIZE - EDGE_SIZE
+    var acc = 0
+    var i = 0
+    while (i < lastIndex) {
+        if (letters[i] == 'X' && letters[i + 1] == 'M' && letters[i + 2] == 'A' && letters[i + 3] == 'S') {
+            acc += 1
         }
+        if (letters[i] == 'X' && letters[i + width - 1] == 'M' && letters[i + width - 1 + width - 1] == 'A' && letters[i + width - 1 + width - 1 + width - 1] == 'S') {
+            acc += 1
+        }
+        if (letters[i] == 'X' && letters[i + width] == 'M' && letters[i + width + width] == 'A' && letters[i + width + width + width] == 'S') {
+            acc += 1
+        }
+        if (letters[i] == 'X' && letters[i + width + 1] == 'M' && letters[i + width + 1 + width + 1] == 'A' && letters[i + width + 1 + width + 1 + width + 1] == 'S') {
+            acc += 1
+        }
+        if (letters[i] == 'S' && letters[i + 1] == 'A' && letters[i + 2] == 'M' && letters[i + 3] == 'X') {
+            acc += 1
+        }
+        if (letters[i] == 'S' && letters[i + width - 1] == 'A' && letters[i + width - 1 + width - 1] == 'M' && letters[i + width - 1 + width - 1 + width - 1] == 'X') {
+            acc += 1
+        }
+        if (letters[i] == 'S' && letters[i + width] == 'A' && letters[i + width + width] == 'M' && letters[i + width + width + width] == 'X') {
+            acc += 1
+        }
+        if (letters[i] == 'S' && letters[i + width + 1] == 'A' && letters[i + width + 1 + width + 1] == 'M' && letters[i + width + 1 + width + 1 + width + 1] == 'X') {
+            acc += 1
+        }
+        i += 1
     }
-    return sum
+    return acc
 }
 
 fun part2(): Any {
-    var sum = 0
-    for (y in table.indices) {
-        for (x in table[y].indices) {
-            if (isLetter(table, 'A', x, y)) {
-                if (isLetter(table, 'M', x - 1, y - 1) &&
-                    isLetter(table, 'M', x + 1, y - 1) &&
-                    isLetter(table, 'S', x - 1, y + 1) &&
-                    isLetter(table, 'S', x + 1, y + 1)
-                ) {
-                    sum += 1
-                }
-                if (isLetter(table, 'M', x + 1, y - 1) &&
-                    isLetter(table, 'M', x + 1, y + 1) &&
-                    isLetter(table, 'S', x - 1, y - 1) &&
-                    isLetter(table, 'S', x - 1, y + 1)
-                ) {
-                    sum += 1
-                }
-                if (isLetter(table, 'M', x - 1, y + 1) &&
-                    isLetter(table, 'M', x + 1, y + 1) &&
-                    isLetter(table, 'S', x - 1, y - 1) &&
-                    isLetter(table, 'S', x + 1, y - 1)
-                ) {
-                    sum += 1
-                }
-                if (isLetter(table, 'M', x - 1, y - 1) &&
-                    isLetter(table, 'M', x - 1, y + 1) &&
-                    isLetter(table, 'S', x + 1, y - 1) &&
-                    isLetter(table, 'S', x + 1, y + 1)
-                ) {
-                    sum += 1
-                }
-            }
+    val (letters, width) = lettersTable
+    val lastIndex = letters.size - (width * EDGE_SIZE + 1) - (EDGE_SIZE + 1)
+    var acc = 0
+    var i = 0
+    while (i < lastIndex) {
+        if (letters[i] == 'M' && letters[i + 2] == 'M' && letters[i + width + 1] == 'A' && letters[i + width + width] == 'S' && letters[i + width + width + 2] == 'S') {
+            acc += 1
         }
+        if (letters[i] == 'S' && letters[i + 2] == 'S' && letters[i + width + 1] == 'A' && letters[i + width + width] == 'M' && letters[i + width + width + 2] == 'M') {
+            acc += 1
+        }
+        if (letters[i] == 'M' && letters[i + 2] == 'S' && letters[i + width + 1] == 'A' && letters[i + width + width] == 'M' && letters[i + width + width + 2] == 'S') {
+            acc += 1
+        }
+        if (letters[i] == 'S' && letters[i + 2] == 'M' && letters[i + width + 1] == 'A' && letters[i + width + width] == 'S' && letters[i + width + width + 2] == 'M') {
+            acc += 1
+        }
+        i += 1
     }
-    return sum
+    return acc
 }
 
 private fun readInput(): List<String> {
@@ -111,13 +73,21 @@ private fun readInput(): List<String> {
         ?: emptyList()
 }
 
-private fun readTable(): Array<CharArray> {
-    return readInput()
-        .map { it.toCharArray() }
-        .toList()
-        .toTypedArray()
-}
-
-private fun isLetter(table: Array<CharArray>, letter: Char, x: Int, y: Int): Boolean {
-    return table.getOrNull(y)?.getOrNull(x).let { it == letter }
+private fun getLettersTableWithWidth(input: List<String>): Pair<CharArray, Int> {
+    val width = input[0].length
+    val height = input.size
+    val lettersTable = CharArray((width + EDGE_SIZE) * (height + EDGE_SIZE))
+    var y = 0
+    while (y < height) {
+        val offset = y * (width + EDGE_SIZE)
+        val line = input[y]
+        var x = 0
+        while (x < width) {
+            val i = offset + x
+            lettersTable[i] = line[x]
+            x += 1
+        }
+        y += 1
+    }
+    return lettersTable to width + EDGE_SIZE
 }
