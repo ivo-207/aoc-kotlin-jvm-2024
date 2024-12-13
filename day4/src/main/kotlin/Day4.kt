@@ -13,30 +13,14 @@ fun part1(): Any {
     var acc = 0
     var i = 0
     while (i < lastIndex) {
-        if (letters[i] == 'X' && letters[i + 1] == 'M' && letters[i + 2] == 'A' && letters[i + 3] == 'S') {
-            acc += 1
-        }
-        if (letters[i] == 'X' && letters[i + width - 1] == 'M' && letters[i + width - 1 + width - 1] == 'A' && letters[i + width - 1 + width - 1 + width - 1] == 'S') {
-            acc += 1
-        }
-        if (letters[i] == 'X' && letters[i + width] == 'M' && letters[i + width + width] == 'A' && letters[i + width + width + width] == 'S') {
-            acc += 1
-        }
-        if (letters[i] == 'X' && letters[i + width + 1] == 'M' && letters[i + width + 1 + width + 1] == 'A' && letters[i + width + 1 + width + 1 + width + 1] == 'S') {
-            acc += 1
-        }
-        if (letters[i] == 'S' && letters[i + 1] == 'A' && letters[i + 2] == 'M' && letters[i + 3] == 'X') {
-            acc += 1
-        }
-        if (letters[i] == 'S' && letters[i + width - 1] == 'A' && letters[i + width - 1 + width - 1] == 'M' && letters[i + width - 1 + width - 1 + width - 1] == 'X') {
-            acc += 1
-        }
-        if (letters[i] == 'S' && letters[i + width] == 'A' && letters[i + width + width] == 'M' && letters[i + width + width + width] == 'X') {
-            acc += 1
-        }
-        if (letters[i] == 'S' && letters[i + width + 1] == 'A' && letters[i + width + 1 + width + 1] == 'M' && letters[i + width + 1 + width + 1 + width + 1] == 'X') {
-            acc += 1
-        }
+        acc += if (letters[i] == 'X' && letters[i + 1] == 'M' && letters[i + 2] == 'A' && letters[i + 3] == 'S') 1 else 0
+        acc += if (letters[i] == 'X' && letters[i + width - 1] == 'M' && letters[i + width - 1 + width - 1] == 'A' && letters[i + width - 1 + width - 1 + width - 1] == 'S') 1 else 0
+        acc += if (letters[i] == 'X' && letters[i + width] == 'M' && letters[i + width + width] == 'A' && letters[i + width + width + width] == 'S') 1 else 0
+        acc += if (letters[i] == 'X' && letters[i + width + 1] == 'M' && letters[i + width + 1 + width + 1] == 'A' && letters[i + width + 1 + width + 1 + width + 1] == 'S') 1 else 0
+        acc += if (letters[i] == 'S' && letters[i + 1] == 'A' && letters[i + 2] == 'M' && letters[i + 3] == 'X') 1 else 0
+        acc += if (letters[i] == 'S' && letters[i + width - 1] == 'A' && letters[i + width - 1 + width - 1] == 'M' && letters[i + width - 1 + width - 1 + width - 1] == 'X') 1 else 0
+        acc += if (letters[i] == 'S' && letters[i + width] == 'A' && letters[i + width + width] == 'M' && letters[i + width + width + width] == 'X') 1 else 0
+        acc += if (letters[i] == 'S' && letters[i + width + 1] == 'A' && letters[i + width + 1 + width + 1] == 'M' && letters[i + width + 1 + width + 1 + width + 1] == 'X') 1 else 0
         i += 1
     }
     return acc
