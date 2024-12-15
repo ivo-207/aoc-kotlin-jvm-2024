@@ -94,14 +94,11 @@ private fun runOperator(operator: Int, first: Long, second: Long): Long {
         0 -> first + second
         1 -> first * second
         2 -> {
-            var acc = first
-            var dividend = second
-            do {
-                dividend /= 10
-                acc *= 10
-            } while (dividend > 0)
-            acc += second
-            acc
+            var scale = 1
+            while (scale <= second) {
+                scale *= 10
+            }
+            first * scale + second
         }
 
         else -> 0
